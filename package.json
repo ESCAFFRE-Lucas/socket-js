@@ -3,7 +3,8 @@
     "build": "tsc",
     "dev:exo1": "ts-node src/exo1-clicker/server.ts",
     "dev:exo2": "ts-node src/exo2-chat/server.ts",
-    "dev:exo3": "ts-node src/exo3-push/server.ts"
+    "dev:exo3": "ts-node src/exo3-push/server.ts",
+    "dev:exo4": "ts-node src/exo4-canvas/server.ts"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
