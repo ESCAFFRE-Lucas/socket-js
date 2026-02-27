@@ -3,18 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Multi-Room</title>
+    <title>Notifications Push</title>
 </head>
 <body>
+    <h1>Simulation de commandes</h1>
 
-<button>
-    Acheter un produit
-</button>
+    <label for="username"></label><input type="text" id="username" placeholder="Votre prénom" />
+    <button id="orderBtn">Nouvelle commande</button>
 
-<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-<script>
-    const socket = io();
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+        const socket = io();
 
-</script>
+        const usernameInput = document.getElementById('username');
+        const orderBtn = document.getElementById('orderBtn');
+
+        orderBtn.addEventListener('click', () => {
+            const username = usernameInput.value.trim() || 'Anonyme';
+            socket.emit('newOrder', username );
+        });
+
+        socket.on('orderNotification', (data) => {
+            alert(`Nouvelle commande de ${data.username} !`);
+        });
+
+    </script>
 </body>
 </html>

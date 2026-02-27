@@ -2,7 +2,8 @@
   "scripts": {
     "build": "tsc",
     "dev:exo1": "ts-node src/exo1-clicker/server.ts",
-    "dev:exo2": "ts-node src/exo2-chat/server.ts"
+    "dev:exo2": "ts-node src/exo2-chat/server.ts",
+    "dev:exo3": "ts-node src/exo3-push/server.ts"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
