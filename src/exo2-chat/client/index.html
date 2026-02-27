@@ -56,17 +56,46 @@
     function sendMessage() {
         const msg = messageInput.value.trim();
         if (msg) {
-            socket.emit('chatMessage', { room: currentRoom, text: msg });
+            addMessageToChat('Toi : ', msg);
+
+            socket.emit('chatMessage', { room: currentRoom, message: msg });
             messageInput.value = '';
         }
     }
 
-    socket.on('message', (msg) => {
+    function addMessageToChat(sender, text) {
         const msgElement = document.createElement('div');
         msgElement.classList.add('message');
-        msgElement.textContent = msg;
+        msgElement.textContent = `${sender}: ${text}`;
         chatBox.appendChild(msgElement);
         chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    socket.on('messageHistory', (msgHistory) => {
+        chatBox.innerHTML = '';
+        msgHistory.forEach(msgObj => {
+            const senderName = (msgObj.senderId === socket.id) ? 'Toi' : 'Autre';
+
+            addMessageToChat(senderName, msgObj.text);
+        });
+    });
+
+    socket.on('newMessage', (msgObj) => {
+        addMessageToChat('Autre', msgObj.text);
+    });
+
+    socket.on('message', (sysMsg) => {
+        addSystemMessage(sysMsg);
+    });
+
+    roomSelect.addEventListener('change', (e) => {
+        const newRoom = e.target.value;
+        socket.emit('leaveRoom', currentRoom);
+        socket.emit('joinRoom', newRoom);
+
+        currentRoom = newRoom;
+        chatBox.innerHTML = '';
+        addSystemMessage(`Tu as rejoint la ${currentRoom}`);
     });
 
     function addSystemMessage(text) {
