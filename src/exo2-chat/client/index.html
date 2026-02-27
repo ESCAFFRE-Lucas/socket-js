@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Multi-Room</title>
+</head>
+<body>
+
+<div class="header">
+    <h2>Un chat comme un autre</h2>
+    <label for="roomSelect"></label><select id="roomSelect">
+        <option value="room1">Room 1</option>
+        <option value="room2">Room 2</option>
+    </select>
+</div>
+
+<div id="chatBox"></div>
+
+<div class="input-area">
+    <label for="messageInput"></label><input type="text" id="messageInput" placeholder="Écris ton message ici..." autocomplete="off">
+    <button id="sendButton">Envoyer</button>
+</div>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+    const socket = io();
+
+    const roomSelect = document.getElementById('roomSelect');
+    const chatBox = document.getElementById('chatBox');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+
+    let currentRoom = roomSelect.value;
+
+    socket.on('connect', () => {
+        socket.emit('joinRoom', currentRoom);
+        addSystemMessage(`Tu as rejoint la ${currentRoom}`);
+    });
+
+    roomSelect.addEventListener('change', (e) => {
+        const newRoom = e.target.value;
+        socket.emit('leaveRoom', currentRoom);
+        socket.emit('joinRoom', newRoom);
+
+        currentRoom = newRoom;
+        chatBox.innerHTML = '';
+        addSystemMessage(`Tu as rejoint la ${currentRoom}`);
+    });
+
+    sendButton.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    function sendMessage() {
+        const msg = messageInput.value.trim();
+        if (msg) {
+            socket.emit('chatMessage', { room: currentRoom, text: msg });
+            messageInput.value = '';
+        }
+    }
+
+    socket.on('message', (msg) => {
+        const msgElement = document.createElement('div');
+        msgElement.classList.add('message');
+        msgElement.textContent = msg;
+        chatBox.appendChild(msgElement);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+
+    function addSystemMessage(text) {
+        const msgElement = document.createElement('div');
+        msgElement.classList.add('system-msg');
+        msgElement.textContent = text;
+        chatBox.appendChild(msgElement);
+    }
+</script>
+</body>
+</html>
